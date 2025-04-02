@@ -5,12 +5,13 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(localStorage.getItem("authToken"));
+  const [username, setUsername] = useState(localStorage.getItem("username"));
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const login = async (username, password) => {
     try {
-      const response = await fetch("http://10.41.1.19:3000/auth/login", {
+      const response = await fetch("http://10.3.141.39:3000/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -22,7 +23,8 @@ export const AuthProvider = ({ children }) => {
       if (!response.ok || !data.token) {
         throw new Error(data.error || "Login failed");
       }
-
+      setUsername(username);
+      localStorage.setItem("username", username);
       localStorage.setItem("authToken", data.token);
       setAuthToken(data.token);
     } catch (error) {
@@ -34,7 +36,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (username, email, password) => {
     try {
-      const response = await fetch("http://10.41.1.19:3000/auth/register", {
+      const response = await fetch("http://10.3.141.39:3000/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,6 +46,8 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
       if (!response.ok) setError(data.message || "Registration failed");
 
+      setUsername(username);
+      localStorage.setItem("username", username);
       localStorage.setItem("authToken", data.token);
       setAuthToken(data.token);
     } catch (error) {
@@ -56,11 +60,14 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("authToken");
     setAuthToken(null);
+    setUsername(null);
     navigate("/login");
   };
 
   return (
-    <AuthContext.Provider value={{ authToken, login, register, logout, error }}>
+    <AuthContext.Provider
+      value={{ authToken, login, register, logout, error, username }}
+    >
       {children}
     </AuthContext.Provider>
   );
