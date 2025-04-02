@@ -8,6 +8,7 @@ const Question = () => {
     getLatestQuestion,
     message,
     responseTime,
+    setResponseTime,
     correctAnswer,
   } = useSocket();
   const [selectedOption, setSelectedOption] = useState(null);
@@ -20,6 +21,12 @@ const Question = () => {
   useEffect(() => {
     setIsCorrect(null);
     if (latestQuestion) {
+      const response_time = localStorage.getItem(
+        `response_time_${latestQuestion.id}`,
+      );
+      if (response_time) {
+        setResponseTime(response_time);
+      }
       const storedAnswer = localStorage.getItem(
         `selected_answer_${latestQuestion.id}`,
       );
@@ -52,7 +59,7 @@ const Question = () => {
     );
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-900 px-4">
+    <div className="flex flex-col items-center justify-start pt-20 min-h-screen bg-gray-900 px-4">
       <div className="w-full max-w-lg text-center mb-4">
         {message && (
           <h1 className="text-lg font-semibold text-gray-900 mt-2 bg-yellow-200 p-2 px-4 rounded-md shadow-sm inline-block">

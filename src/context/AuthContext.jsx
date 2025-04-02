@@ -11,14 +11,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await fetch("http://10.3.141.39:3000/auth/login", {
+      const response = await fetch("https://ws.visioncse.tech/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
       });
-
       const data = await response.json();
       if (!response.ok || !data.token) {
         throw new Error(data.error || "Login failed");
@@ -36,7 +35,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (username, email, password) => {
     try {
-      const response = await fetch("http://10.3.141.39:3000/auth/register", {
+      const response = await fetch("https://ws.visioncse.tech/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

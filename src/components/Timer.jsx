@@ -34,7 +34,7 @@ const Timer = () => {
   }, [timeLeft]);
 
   return (
-    <h3 className="text-2xl font-bold text-center text-white bg-red-600 px-4 py-2 rounded-lg shadow-md">
+    <h3 className="text-lg sm:text-2xl font-bold text-center text-white bg-red-600 px-2 sm:px-4 py-2 rounded-lg shadow-md">
       {quizTimeLeft > 0
         ? `Quiz will start in ${Math.floor(quizTimeLeft / 60)} m ${quizTimeLeft % 60}s`
         : `⏳ Time Left: ${questionTime}s`}

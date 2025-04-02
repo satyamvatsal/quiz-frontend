@@ -3,16 +3,14 @@ import { io } from "socket.io-client";
 import { useAuth } from "./AuthContext";
 
 const SocketContext = createContext();
-const SOCKET_SERVER_URL = "ws://10.3.141.39:3000";
+const SOCKET_SERVER_URL = "wss://ws.visioncse.tech";
 
 const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [latestQuestion, setLatestQuestion] = useState(null);
   const [startTime, setStartTime] = useState(0);
   const [message, setMessage] = useState("");
-  const [responseTime, setResponseTime] = useState(
-    localStorage.getItem("response_time"),
-  );
+  const [responseTime, setResponseTime] = useState(null);
   const [correctAnswer, setCorrectAnswer] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
   const [score, setScore] = useState(localStorage.getItem("score") || 0);
@@ -49,23 +47,16 @@ const SocketProvider = ({ children }) => {
     newSocket.on("new_question", (question) => {
       setLatestQuestion(question);
       setStartTime(question.start_time);
-      setResponseTime(null);
-      localStorage.setItem("response_time", null);
       setMessage("");
       setCorrectAnswer(null);
     });
 
-    newSocket.on("time_up", () => {
+    newSocket.on("answer_received", ({ response_time }) => {
       setMessage("Time up !!");
-    });
-    newSocket.on("answer_received", ({ message, response_time }) => {
-      setMessage(message);
       setResponseTime(response_time);
-      localStorage.setItem("response_time", response_time);
     });
 
     newSocket.on("correct_answer", (correctAnswer) => {
-      console.log(correctAnswer);
       setCorrectAnswer(correctAnswer);
     });
     newSocket.on("update_score", ({ score }) => {
@@ -74,12 +65,16 @@ const SocketProvider = ({ children }) => {
     });
     newSocket.on("quiz_info", ({ msg, timeLeft }) => {
       setMessage(msg);
-      console.log("Time Left : ", timeLeft);
       setTimeLeft(timeLeft);
     });
 
     return () => newSocket.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (latestQuestion && responseTime)
+      localStorage.setItem(`response_time_${latestQuestion.id}`, responseTime);
+  }, [responseTime, latestQuestion]);
 
   const submitAnswer = (questionId, answer) => {
     if (socket) {
@@ -105,6 +100,7 @@ const SocketProvider = ({ children }) => {
         message,
         score,
         timeLeft,
+        setResponseTime,
       }}
     >
       {children}
