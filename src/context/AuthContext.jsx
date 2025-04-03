@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -8,10 +7,12 @@ export const AuthProvider = ({ children }) => {
   const [username, setUsername] = useState(localStorage.getItem("username"));
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const login = async (username, password) => {
     try {
-      const response = await fetch("https://ws.visioncse.tech/auth/login", {
+      console.log(BACKEND_URL);
+      const response = await fetch(`${BACKEND_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -35,7 +36,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (username, email, password) => {
     try {
-      const response = await fetch("https://ws.visioncse.tech/auth/register", {
+      const response = await fetch(`${BACKEND_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

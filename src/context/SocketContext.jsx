@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import { useAuth } from "./AuthContext";
 
 const SocketContext = createContext();
-const SOCKET_SERVER_URL = "wss://ws.visioncse.tech";
+const SOCKET_SERVER_URL = import.meta.env.VITE_SOCKET_SERVER_URL;
 
 const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
@@ -12,7 +12,9 @@ const SocketProvider = ({ children }) => {
   const [message, setMessage] = useState("");
   const [responseTime, setResponseTime] = useState(null);
   const [correctAnswer, setCorrectAnswer] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(null);
+  const [scores, setScores] = useState(null);
+  const [quizEnded, setQuizEnded] = useState(false);
+  const [quizStartTime, setQuizStartTime] = useState(null);
   const [score, setScore] = useState(localStorage.getItem("score") || 0);
   const { logout } = useAuth();
 
@@ -27,13 +29,8 @@ const SocketProvider = ({ children }) => {
       },
     });
     setSocket(newSocket);
-    const fetchLatestQuestion = () => {
-      console.log("🔄 Requesting latest question...");
-      newSocket.emit("get_latest_question");
-    };
     newSocket.on("connect", () => {
       console.log("✅ Connected to WebSocket Server:", newSocket.id);
-      fetchLatestQuestion();
     });
 
     newSocket.on("disconnect", (reason) => {
@@ -52,20 +49,27 @@ const SocketProvider = ({ children }) => {
     });
 
     newSocket.on("answer_received", ({ response_time }) => {
-      setMessage("Time up !!");
       setResponseTime(response_time);
     });
 
     newSocket.on("correct_answer", (correctAnswer) => {
+      setMessage("Time up !!");
       setCorrectAnswer(correctAnswer);
     });
     newSocket.on("update_score", ({ score }) => {
       setScore(score);
       localStorage.setItem("score", score);
     });
-    newSocket.on("quiz_info", ({ msg, timeLeft }) => {
-      setMessage(msg);
-      setTimeLeft(timeLeft);
+    newSocket.on("quiz_info", ({ message, quizStartTime, quizEnded }) => {
+      if (quizEnded) {
+        setQuizEnded(true);
+        setLatestQuestion(null);
+      }
+      setMessage(message);
+      setQuizStartTime(quizStartTime);
+    });
+    newSocket.on("update_leaderboard", (data) => {
+      setScores(data.scores);
     });
 
     return () => newSocket.disconnect();
@@ -99,8 +103,11 @@ const SocketProvider = ({ children }) => {
         responseTime,
         message,
         score,
-        timeLeft,
+        quizStartTime,
+        quizEnded,
         setResponseTime,
+        scores,
+        setScores,
       }}
     >
       {children}
