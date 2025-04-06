@@ -15,6 +15,8 @@ const SocketProvider = ({ children }) => {
   const [scores, setScores] = useState(null);
   const [quizEnded, setQuizEnded] = useState(false);
   const [quizStartTime, setQuizStartTime] = useState(null);
+  const [activeUsers, setActiveUsers] = useState(0);
+  const [userRank, setUserRank] = useState(null);
   const [score, setScore] = useState(localStorage.getItem("score") || 0);
   const { logout } = useAuth();
 
@@ -71,6 +73,18 @@ const SocketProvider = ({ children }) => {
     newSocket.on("update_leaderboard", (data) => {
       setScores(data.scores);
     });
+    newSocket.on("active_users", (active_users) => {
+      console.log(active_users);
+      setActiveUsers(active_users);
+    });
+    newSocket.on("user_rank", (rank) => {
+      console.log("rank: ", rank);
+      setUserRank(rank);
+    });
+    newSocket.on("error", ({ message }) => {
+      console.log("error : ", message);
+      setMessage(message);
+    });
 
     return () => newSocket.disconnect();
   }, []);
@@ -107,7 +121,9 @@ const SocketProvider = ({ children }) => {
         quizEnded,
         setResponseTime,
         scores,
+        activeUsers,
         setScores,
+        userRank,
       }}
     >
       {children}

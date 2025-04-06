@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSocket } from "../context/SocketContext";
+import { useNavigate } from "react-router-dom";
 
 const Question = () => {
   const {
@@ -12,9 +13,11 @@ const Question = () => {
     correctAnswer,
     quizEnded,
     score,
+    userRank,
   } = useSocket();
   const [selectedOption, setSelectedOption] = useState(null);
   const [isCorrect, setIsCorrect] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getLatestQuestion();
@@ -58,15 +61,25 @@ const Question = () => {
       <div className="flex flex-col items-center justify-start pt-20 min-h-screen bg-gray-900 px-4">
         <div className="w-full max-w-lg text-center mb-4">
           {message && (
-            <h1 className="text-lg font-semibold text-gray-900 mt-2 bg-yellow-200 p-2 px-4 rounded-md shadow-sm inline-block">
+            <h1 className="text-lg fontCPXplore-semibold text-gray-900 mt-2 bg-yellow-200 p-2 px-4 rounded-md shadow-sm inline-block">
               {message}
             </h1>
           )}
         </div>
         {quizEnded ? (
-          <h2 className="text-center text-4xl font-bold text-white">
-            Your score: {score}
-          </h2>
+          <div className="space-y-4 text-white text-center bg-gray-800 p-6 rounded-xl shadow-lg w-full max-w-md mx-auto">
+            <h2 className="text-4xl font-bold">Your score: {score}</h2>
+            <h2 className="text-4xl font-bold text-green-400">
+              Your rank: {userRank}
+            </h2>
+
+            <button
+              onClick={() => navigate("/leaderboard")}
+              className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full transition duration-200"
+            >
+              View Leaderboard
+            </button>
+          </div>
         ) : (
           <h2 className="text-center text-gray-500 text-xl">
             ⌛ Waiting for the next question...

@@ -48,7 +48,7 @@ const LeaderBoard = () => {
               key={index}
               className="flex justify-between items-center p-4 text-white bg-white/20 rounded-lg mb-2 hover:bg-white/30 transition"
             >
-              <span className="font-semibold">#{index + 1}</span>
+              <span className="font-semibold">#{user.rank}</span>
               <span className="text-lg">{user.username}</span>
               <span className="font-bold text-yellow-300">
                 {user.score} pts
