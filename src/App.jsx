@@ -4,6 +4,7 @@ import QuizPage from "./pages/QuizPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import LeaderBoard from "./pages/Leaderboard";
+import TechStacks from "./pages/TechStack";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 
@@ -11,30 +12,39 @@ const App = () => {
   return (
     <Router>
       <AuthProvider>
-        <SocketProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-
-            <Route path="/leaderboard" element={<LeaderBoard />} />
-            <Route path="/register" element={<Register />} />
-            <Route
-              path="/quiz"
-              element={
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/know-more" element={<TechStacks />} />
+          <Route
+            path="/leaderboard"
+            element={
+              <SocketProvider>
+                <LeaderBoard />
+              </SocketProvider>
+            }
+          />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/quiz"
+            element={
+              <SocketProvider>
                 <ProtectedRoute>
                   <QuizPage />
                 </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/"
-              element={
+              </SocketProvider>
+            }
+          />
+          <Route
+            path="/"
+            element={
+              <SocketProvider>
                 <ProtectedRoute>
                   <QuizPage />
                 </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </SocketProvider>
+              </SocketProvider>
+            }
+          />
+        </Routes>
       </AuthProvider>
     </Router>
   );

@@ -4,7 +4,7 @@ import { SocketContext } from "../context/SocketContext";
 const Timer = () => {
   const { startTime, quizStartTime, quizEnded } = useContext(SocketContext);
   const [quizTimeLeft, setQuizTimeLeft] = useState("waiting...");
-  const [questionTime, setQuestionTime] = useState(10);
+  const [questionTime, setQuestionTime] = useState(15);
   const [hours, setHours] = useState(null);
   const [minutes, setMinutes] = useState(null);
   const [seconds, setSeconds] = useState(null);
@@ -26,7 +26,7 @@ const Timer = () => {
     const updateTime = () => {
       const remainingTime = Math.max(
         0,
-        Math.floor((10 * 1000 - (Date.now() - startTime)) / 1000),
+        Math.floor((15 * 1000 - (Date.now() - startTime)) / 1000),
       );
       setQuestionTime(remainingTime);
     };

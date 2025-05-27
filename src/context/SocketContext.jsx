@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useAuth } from "./AuthContext";
+import { useLocation } from "react-router-dom";
 
 const SocketContext = createContext();
 const SOCKET_SERVER_URL = import.meta.env.VITE_SOCKET_SERVER_URL;
@@ -19,7 +20,7 @@ const SocketProvider = ({ children }) => {
   const [userRank, setUserRank] = useState(null);
   const [score, setScore] = useState(localStorage.getItem("score") || 0);
   const { logout } = useAuth();
-
+  const location = useLocation();
   useEffect(() => {
     const newSocket = io(SOCKET_SERVER_URL, {
       transports: ["websocket"],
@@ -71,6 +72,7 @@ const SocketProvider = ({ children }) => {
       setQuizStartTime(quizStartTime);
     });
     newSocket.on("update_leaderboard", (data) => {
+      console.log(data.scores);
       setScores(data.scores);
     });
     newSocket.on("active_users", (active_users) => {
@@ -88,6 +90,14 @@ const SocketProvider = ({ children }) => {
 
     return () => newSocket.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    if (location.pathname === "/leaderboard") {
+      socket.emit("getLeaderboard");
+    }
+  }, [location.pathname, socket]);
 
   useEffect(() => {
     if (latestQuestion && responseTime)

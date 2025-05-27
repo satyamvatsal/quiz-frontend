@@ -22,6 +22,46 @@ const Question = () => {
   useEffect(() => {
     getLatestQuestion();
   }, []);
+  const handleNewGame = async () => {
+    try {
+      const authToken = localStorage.getItem("authToken");
+      const username = localStorage.getItem("username");
+      localStorage.clear();
+      if (authToken !== null) {
+        localStorage.setItem("authToken", authToken);
+      }
+      if (username) localStorage.setItem("username", username);
+      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+      if (!authToken) {
+        console.error("No auth token found");
+        return;
+      }
+      const response = await fetch(`${BACKEND_URL}/admin/start`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error(
+          "Server Error:",
+          errorData.message || response.statusText,
+        );
+        return;
+      }
+      const data = await response.json();
+      console.log("Message from server:", data.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
+      window.location.reload();
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     setIsCorrect(null);
@@ -70,20 +110,68 @@ const Question = () => {
           <div className="space-y-4 text-white text-center bg-gray-800 p-6 rounded-xl shadow-lg w-full max-w-md mx-auto">
             <h2 className="text-4xl font-bold">Your score: {score}</h2>
             <h2 className="text-4xl font-bold text-green-400">
-              Your rank: {userRank}
+              {userRank == "1" ? "🎉 You Won" : "😭 You lose"}
             </h2>
 
             <button
               onClick={() => navigate("/leaderboard")}
-              className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full transition duration-200"
+              className="mt-4 mx-10 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full transition duration-200"
             >
               View Leaderboard
             </button>
+            <button
+              onClick={() => handleNewGame()}
+              className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full transition duration-200"
+            >
+              New game
+            </button>
+            <p className="mt-6 text-base text-white font-medium">
+              Made by{" "}
+              <span className="text-blue-300 font-semibold">
+                team Vision CSE
+              </span>{" "}
+              using <span className="text-yellow-300">Socket.io</span>
+            </p>
+
+            {/* Smaller stack detail */}
+            <a href="/know-more">
+              <p className="text-xs text-gray-400 mt-4">
+                Server: Express • Real-time: Socket.io
+              </p>
+              <span className="text-xs text-gray-400 mt-4">
+                • Caching: Redis
+              </span>
+            </a>
           </div>
         ) : (
-          <h2 className="text-center text-gray-500 text-xl">
-            ⌛ Waiting for the next question...
-          </h2>
+          <div className="">
+            <h2 className="text-center text-gray-500 text-xl">
+              ⌛ Waiting for the question...
+            </h2>
+            <div className="mt-4 px-4 text-gray-100 text-md space-y-2">
+              <p>
+                📌 <strong>Scoring Rules:</strong>
+              </p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>
+                  You can earn up to <strong>100 points</strong> for each
+                  correct answer. The score decreases linearly with your
+                  response time.
+                </li>
+                <li>
+                  Each incorrect answer results in a{" "}
+                  <strong>20-point deduction</strong>.
+                </li>
+                <li>
+                  You can view your <strong>live score</strong> and{" "}
+                  <strong>rank</strong> in the user section.
+                </li>
+                <li>
+                  You can click on your <strong>username</strong> to logout
+                </li>
+              </ul>
+            </div>
+          </div>
         )}
       </div>
     );
@@ -106,8 +194,11 @@ const Question = () => {
           <ul className="space-y-3">
             {latestQuestion.options.map((option, index) => {
               const optionLetter = String.fromCharCode(65 + index);
-              let buttonColor = "bg-gray-700 hover:bg-green-600";
-              if (selectedOption === optionLetter) {
+              let buttonColor = "bg-gray-700 hover:bg-gray-900";
+              if (correctAnswer !== null && correctAnswer === optionLetter) {
+                buttonColor = "bg-green-500";
+              } else if (selectedOption === optionLetter) {
+                // If the user selected this option, handle the selected option logic.
                 if (correctAnswer === null) {
                   buttonColor = "bg-orange-500";
                 } else {

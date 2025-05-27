@@ -56,9 +56,8 @@ export const AuthProvider = ({ children }) => {
       console.error("Registration Error:", error.message);
     }
   };
-
-  const logout = () => {
-    localStorage.removeItem("authToken");
+  const handleLogout = () => {
+    localStorage.clear();
     setAuthToken(null);
     setUsername(null);
     navigate("/login");
@@ -66,7 +65,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ authToken, login, register, logout, error, username }}
+      value={{ authToken, login, register, handleLogout, error, username }}
     >
       {children}
     </AuthContext.Provider>
