@@ -31,7 +31,7 @@ const Question = () => {
         localStorage.setItem("authToken", authToken);
       }
       if (username) localStorage.setItem("username", username);
-      const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+      const BACKEND_URL = quizws.satyamvatsal.me;
       if (!authToken) {
         console.error("No auth token found");
         return;

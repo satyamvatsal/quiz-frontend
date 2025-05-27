@@ -4,7 +4,7 @@ import { useAuth } from "./AuthContext";
 import { useLocation } from "react-router-dom";
 
 const SocketContext = createContext();
-const SOCKET_SERVER_URL = import.meta.env.VITE_SOCKET_SERVER_URL;
+const SOCKET_SERVER_URL = quizws.satyamvatsal.me;
 
 const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
