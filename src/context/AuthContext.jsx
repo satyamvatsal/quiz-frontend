@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [username, setUsername] = useState(localStorage.getItem("username"));
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const BACKEND_URL = quizws.satyamvatsal.me;
+  const BACKEND_URL = https://quizws.satyamvatsal.me;
 
   const login = async (username, password) => {
     try {
