@@ -15,7 +15,7 @@ const QuizPage = () => {
   }, [authToken]);
   const handleStart = async () => {
     try {
-      const BACKEND_URL = https://quizws.satyamvatsal.me;
+      const BACKEND_URL = "https://quizws.satyamvatsal.me";
       const authToken = localStorage.getItem("authToken");
       if (!authToken) {
         console.error("No auth token found");
